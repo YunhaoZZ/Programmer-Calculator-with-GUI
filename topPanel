@@ -1,0 +1,255 @@
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.*;
+
+public class topPanel extends JPanel implements MouseListener{
+
+	JLabel title, process, results;
+	JButton hex, dec, oct, bin;
+	//JTextField results;
+	JButton InputScale;
+	GuiCalculator cal;
+	
+	topPanel(){
+		this(null);
+	}
+	
+	topPanel(GuiCalculator cal){		
+		super(new GridLayout(0,1));
+		
+		this.cal = cal;
+		
+		//Programmer Title
+		ImageIcon menu = new ImageIcon("C:\\Users\\Zhang\\Desktop\\csHW\\Project_2\\src\\menu.jpg");
+		title = new JLabel("Programmer",menu,JLabel.LEFT);
+		title.setFont(new Font(title.getFont().getName(), Font.BOLD, 20));
+		
+		//Display process
+		process = new JLabel("", JLabel.RIGHT);
+		process.setFont(new Font(process.getFont().getName(), Font.ITALIC, 17));
+		process.setForeground(Color.GRAY);
+		
+		//Display number
+		results = new JLabel("0");
+		results.setHorizontalAlignment(SwingConstants.RIGHT);
+		results.setBorder(null);
+		results.setBackground(getBackground());
+		results.setFont(new Font(results.getFont().getName(), Font.BOLD, 30));
+		//results.setEditable(false);
+		
+		//converters
+		hex = new JButton("HEX  0");
+		hex.setHorizontalAlignment(SwingConstants.LEFT);
+		hex.setBorderPainted(false);
+		hex.setOpaque(false);
+		hex.setContentAreaFilled(false);
+		hex.setFont(new Font(hex.getFont().getName(), Font.BOLD, 16));
+		
+		dec = new JButton("DEC  0");
+		dec.setHorizontalAlignment(SwingConstants.LEFT);
+		dec.setBorderPainted(false);
+		dec.setBackground(Color.BLACK);
+		dec.setForeground(Color.WHITE);
+		dec.setFont(new Font(dec.getFont().getName(), Font.BOLD, 16));
+		
+		InputScale = dec;
+		
+		oct = new JButton("OCT  0");
+		oct.setHorizontalAlignment(SwingConstants.LEFT);
+		oct.setBorderPainted(false);
+		oct.setOpaque(false);
+		oct.setContentAreaFilled(false);
+		oct.setFont(new Font(oct.getFont().getName(), Font.BOLD, 16));
+		
+		bin = new JButton("BIN  0");
+		bin.setHorizontalAlignment(SwingConstants.LEFT);
+		bin.setBorderPainted(false);
+		bin.setOpaque(false);
+		bin.setContentAreaFilled(false);
+		bin.setFont(new Font(bin.getFont().getName(), Font.BOLD, 16));
+		
+		hex.addMouseListener(this);
+		dec.addMouseListener(this);
+		oct.addMouseListener(this);
+		bin.addMouseListener(this);
+		
+		add(title);
+		add(process);
+		add(results);
+		add(hex);
+		add(dec);
+		add(oct);
+		add(bin);
+	}
+
+	public void displayCurrent() {
+		results.setText(cal.currentOperation);
+		
+	}
+	
+	public void displayDone() {
+			String done = "";
+			for(String s: cal.doneOperation) {
+				done += s;
+			}
+			process.setText(done);
+	}
+	
+	public void displayScales() {
+		if(InputScale == dec) {
+			dec.setText("DEC  " + cal.currentOperation);
+			hex.setText("HEX  "+ dec2Hex(cal.currentOperation));
+			bin.setText("BIN  "+ dec2Bin(cal.currentOperation));
+			oct.setText("OCT  "+ dec2Oct(cal.currentOperation));
+		}else if(InputScale == hex) {
+			hex.setText("HEX  " + cal.currentOperation);
+			dec.setText("DEC  "+ hex2Dec(cal.currentOperation));
+			bin.setText("BIN  "+ dec2Bin(dec.getText().substring(5)));
+			oct.setText("OCT  "+ dec2Oct(dec.getText().substring(5)));
+		}else if(InputScale == oct) {
+			oct.setText("OCT  " + cal.currentOperation);
+			dec.setText("DEC  "+ oct2Dec(cal.currentOperation));
+			hex.setText("HEX  "+ dec2Hex(dec.getText().substring(5)));
+			bin.setText("BIN  "+ dec2Bin(dec.getText().substring(5)));
+		}else if(InputScale == bin) {
+			bin.setText("BIN  " + cal.currentOperation);
+			dec.setText("DEC  "+ bin2Dec(cal.currentOperation));
+			oct.setText("OCT  "+ dec2Oct(dec.getText().substring(5)));
+			hex.setText("HEX  "+ dec2Hex(dec.getText().substring(5)));
+		}
+		
+	}
+	
+	public String dec2Hex(String dec) {
+		long value = Long.parseLong(dec);
+		if(value < 0) 
+			value += Math.pow(2, 64);
+		long div = value/16;
+		long rem = value%16;
+		if(div > 0) {
+			if(rem < 10)
+				return dec2Hex(div + "")+String.valueOf(rem);
+			else
+				return dec2Hex(div + "")+(char)('A'+rem-10);//if the remainder need to be represented with letter, convert it
+		}else {
+			if(rem < 10)
+				return rem+"";
+			else
+				return (char)('A'+rem-10)+"";
+		}
+	}
+	
+	public String dec2Bin(String dec) {
+		long value = Long.parseLong(dec);
+		if(value < 0) 
+			value += Math.pow(2, 64);
+		long div = value/2;
+		long rem = value%2;
+		if(div > 0) {
+			return dec2Bin(div+"")+String.valueOf(rem);
+		}else {
+			return rem+"";
+		}
+	}
+	
+	public String dec2Oct(String dec) {
+		long value = Long.parseLong(dec);
+		if(value < 0) 
+			value += Math.pow(2, 64);
+		long div = value/8;
+		long rem = value%8;
+		if(div > 0) {
+			return dec2Oct(div+"")+String.valueOf(rem);
+		}else {
+			return rem+"";
+		}
+	}
+	
+	public long hex2Dec(String hexString) {
+			int length = hexString.length();
+			long i;
+			
+			// if it is digit, calculate straightly
+			if(Character.isDigit(hexString.charAt(0)))
+				i = hexString.charAt(0) - '0';
+			//if it is letter, convert to hex number
+			else
+				i = 10 + hexString.charAt(0) - 'A';
+			
+			if(length == 1) {
+				return i;
+			}
+			
+			//pass the substring into next recursion so no need to worry about index
+			return (long)(i*Math.pow(16, length-1)) + hex2Dec(hexString.substring(1));
+	}
+	
+	public long bin2Dec(String binaryString) {
+		int length = binaryString.length();
+		long i = binaryString.charAt(0) - '0';
+		
+		if(length == 1) {
+			return i;
+		}
+		
+		//pass the substring into next recursion so no need to worry about index
+		return (long)(i*Math.pow(2, length-1)) + bin2Dec(binaryString.substring(1));
+	}
+	
+	public long oct2Dec(String binaryString) {
+		int length = binaryString.length();
+		long i = binaryString.charAt(0) - '0';
+		
+		if(length == 1) {
+			return i;
+		}
+		
+		//pass the substring into next recursion so no need to worry about index
+		return (long)(i*Math.pow(8, length-1)) + oct2Dec(binaryString.substring(1));
+	}
+	
+	
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		if(e.getSource() != InputScale) {
+			InputScale.setOpaque(false);
+			InputScale.setContentAreaFilled(false);
+			InputScale.setForeground(getForeground());
+			
+			((JButton) e.getSource()).setOpaque(true);
+			((JButton) e.getSource()).setContentAreaFilled(true);
+			((JButton) e.getSource()).setBackground(Color.BLACK);
+			((JButton) e.getSource()).setForeground(Color.WHITE);
+			InputScale = ((JButton) e.getSource());
+			cal.bot.changeScale(InputScale.getText());
+		}
+		
+		//deal with hex, dec, oct, or bin
+		
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		((JButton) e.getSource()).setBorderPainted(true);	
+		((JButton) e.getSource()).setToolTipText(((JButton) e.getSource()).getText().substring(5));
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		((AbstractButton) e.getSource()).setBorderPainted(false);
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+}

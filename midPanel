@@ -1,0 +1,120 @@
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+
+public class midPanel extends JPanel implements MouseListener{
+
+	JButton full, bit, MS, M, word;
+	public String InputMode;//limit the range of input
+	GuiCalculator cal;
+	
+	midPanel(){
+		this(null);
+	}
+	
+	midPanel(GuiCalculator cal){
+		super(new GridLayout(1,5));
+		
+		this.cal = cal;
+		
+		setBorder(new LineBorder(Color.lightGray, 1));
+		setPreferredSize(new Dimension(450, 35));
+		
+		//4 unfunctional buttons and 1 functional one
+		ImageIcon ful = new ImageIcon("C:\\Users\\Zhang\\Desktop\\csHW\\Project_2\\src\\full.png");
+		full = new JButton(ful);
+		full.setBorderPainted(false);
+		full.setOpaque(false);
+		full.setContentAreaFilled(false);
+		
+		ImageIcon bits = new ImageIcon("C:\\Users\\Zhang\\Desktop\\csHW\\Project_2\\src\\bits.jpg");
+		bit = new JButton(bits);
+		bit.setBorderPainted(false);
+		bit.setOpaque(false);
+		bit.setContentAreaFilled(false);
+		
+		MS = new JButton("MS");
+		MS.setBorderPainted(false);
+		MS.setOpaque(false);
+		MS.setContentAreaFilled(false);
+		
+		M = new JButton("M");
+		M.setBorderPainted(false);
+		M.setOpaque(false);
+		M.setContentAreaFilled(false);
+		
+		word = new JButton("QWORD");
+		word.setBorderPainted(false);
+		word.setOpaque(false);
+		word.setContentAreaFilled(false);
+		word.setFont(new Font(word.getFont().getName(), Font.BOLD, 13));
+		word.setForeground(Color.BLUE);
+		
+		//record Input Mode
+		InputMode = word.getText();
+		
+		full.addMouseListener(this);
+		bit.addMouseListener(this);
+		MS.addMouseListener(this);
+		M.addMouseListener(this);
+		word.addMouseListener(this);
+		
+		add(full);
+		add(bit);
+		add(word);
+		add(MS);
+		add(M);
+		
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+		//Mouse click turns Input Mode to the next mode
+		if(e.getSource() == word) {
+			switch(InputMode) {
+				case "QWORD":
+					InputMode = "DWORD";
+					break;
+				case "DWORD":
+					InputMode = "WORD";
+					break;
+				case "WORD":
+					InputMode = "BYTE";
+					break;
+				case "BYTE":
+					InputMode = "QWORD";
+					break;				
+			}
+			word.setText(InputMode);
+			
+		}
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		((JButton) e.getSource()).setBorderPainted(true);	
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		((JButton) e.getSource()).setBorderPainted(false);			
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+}
+

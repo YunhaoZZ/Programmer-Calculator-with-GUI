@@ -1,0 +1,367 @@
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.math.BigInteger;
+
+import javax.swing.*;
+import javax.swing.border.LineBorder;
+
+public class botPanel extends JPanel implements
+									//KeyListener, 
+									MouseListener{
+
+	JButton sign1, sign2, sign3, sign4, sign5, sign6, arrow1,
+			Mod, CE, Clear, backSpace, divide, A, B, num7,num8,num9,
+			by, C, D,num4,num5,num6, subs, E, F, num1,num2,num3, plus,
+			Lbracket, Rbracket, negaSign, num0, dot, equal;
+	GuiCalculator cal;
+	//int outOfRangeTest = -1;//-1 means not out of range
+	
+	boolean operator = false;
+	boolean evalDone = false;
+	boolean rightBrac = false;
+	
+	botPanel(){
+		this(null);
+	}
+	
+	botPanel(GuiCalculator cal){
+		this.cal = cal;
+		
+		sign1 = new JButton("Lsh");
+		sign2 = new JButton("Rsh");
+		sign3 = new JButton("Or");
+		sign4 = new JButton("Xor");
+		sign5 = new JButton("Not");
+		sign6 = new JButton("And");
+		arrow1 = new JButton("↑");
+		Mod = new JButton("Mod");
+		CE = new JButton("CE");
+		Clear = new JButton("C");
+		backSpace = new JButton("↩");
+		divide = new JButton("÷");
+		A = new JButton("A");
+		B = new JButton("B");
+		num7 = new JButton("7");
+		num8 = new JButton("8");
+		num9 = new JButton("9");
+		by = new JButton("⨉");
+		C = new JButton("C");
+		D = new JButton("D");
+		num4 = new JButton("4");
+		num5 = new JButton("5");
+		num6 = new JButton("6");
+		subs = new JButton("−");
+		E = new JButton("E");
+		F = new JButton("F");
+		num1 = new JButton("1");
+		num2 = new JButton("2");
+		num3 = new JButton("3");
+		plus = new JButton("+");
+		Lbracket = new JButton("(");
+		Rbracket = new JButton(")");
+		negaSign = new JButton("±");
+		num0 = new JButton("0");
+		dot = new JButton(".");
+		equal = new JButton("=");
+		
+		add(sign1);
+		add(sign2);
+		add(sign3);
+		add(sign4);
+		add(sign5);
+		add(sign6);
+		add(arrow1);
+		add(Mod);
+		add(CE);
+		add(Clear);
+		add(backSpace);
+		add(divide);
+		add(A);
+		add(B);
+		add(num7);
+		add(num8);
+		add(num9);
+		add(by);
+		add(C);
+		add(D);
+		add(num4);
+		add(num5);
+		add(num6);
+		add(subs);
+		add(E);
+		add(F);
+		add(num1);
+		add(num2);
+		add(num3);
+		add(plus);
+		add(Lbracket);
+		add(Rbracket);
+		add(negaSign);
+		add(num0);
+		add(dot);
+		add(equal);
+		
+		
+		//this.addKeyListener(this);
+		setLayout(new GridLayout(6,6));
+		
+		this.setVisible(false);
+		setPreferredSize(new Dimension(450, 250));
+		for (Component comp : this.getComponents()) {
+			comp.setFont(new Font(this.getFont().getName(), Font.BOLD, 17));
+			comp.setBackground(new Color(224,224,224));
+			((JButton)comp).setBorder(new LineBorder(Color.white, 1));
+			
+			if(comp == sign1 || comp == sign2 ||comp == sign3||comp == sign4||comp == sign5||comp == sign6 ||comp == arrow1) {}
+			else {
+				comp.addMouseListener(this);}
+		}
+		this.setVisible(true);
+		
+		A.setEnabled(false);
+		B.setEnabled(false);
+		C.setEnabled(false);
+		D.setEnabled(false);
+		E.setEnabled(false);
+		F.setEnabled(false);
+		dot.setEnabled(false);
+	}
+
+
+	@Override
+	public void mouseClicked(MouseEvent e) {
+
+		if(e.getSource() == Clear) {
+			cal.currentOperation = "0";
+			cal.doneOperation.clear();
+			operator = false;
+		}else if(e.getSource() == CE) {
+			cal.currentOperation = "0";
+		}else if(e.getSource() == backSpace) {
+			if(cal.currentOperation == "0") {}
+			else {
+				if(cal.currentOperation.length() >= 2) {
+					String edited = cal.currentOperation.substring(0, cal.currentOperation.length()-1);
+					cal.currentOperation = edited;
+				}else {
+					cal.currentOperation = "0";
+				}
+				
+			}
+		}else if(e.getSource() == Mod ||e.getSource() == divide ||e.getSource() == by||e.getSource() == subs||e.getSource() == plus){
+			if(operator == false) {
+				if(rightBrac) { rightBrac = false;}
+				else
+					cal.doneOperation.add(cal.currentOperation + " ");
+				//eval
+				cal.doneOperation.add(((JButton)e.getSource()).getText() + " ");
+				operator = true;
+			}else {
+				cal.doneOperation.set(cal.doneOperation.size()-1, ((JButton)e.getSource()).getText() + " ");
+			}
+			
+		}else if(e.getSource() ==Lbracket||e.getSource() == Rbracket) {
+			if(e.getSource() == Rbracket) {
+				cal.doneOperation.add(cal.currentOperation);
+				rightBrac = true;
+				cal.doneOperation.add(((JButton)e.getSource()).getText() + " ");
+			}else {
+			cal.doneOperation.add(((JButton)e.getSource()).getText() + " ");
+			operator = true;}
+		}else if(e.getSource() == negaSign) {
+			cal.currentOperation = "-" + cal.currentOperation;
+		}else if(e.getSource() == equal) {
+			if(rightBrac) { rightBrac = false;}
+			else
+				cal.doneOperation.add(cal.currentOperation);
+
+			cal.currentOperation = cal.evaluateResult();
+			cal.doneOperation.clear();
+			
+			evalDone = true;
+			operator = false;
+		}else {
+			long max;
+			long min;
+			if(cal.mid.InputMode == "QWORD") {
+				max = Long.MAX_VALUE;
+				min = Long.MIN_VALUE;
+			}else if(cal.mid.InputMode == "DWORD") {
+				max = Integer.MAX_VALUE;
+				min = Integer.MIN_VALUE;
+			}else if(cal.mid.InputMode == "WORD") {
+				max = Short.MAX_VALUE;
+				min = Short.MIN_VALUE;
+			}else {
+				max = Byte.MAX_VALUE;
+				min = Byte.MIN_VALUE;
+			}
+			
+			BigInteger number;
+			if(cal.top.InputScale.getText().contains("DEC")) {
+				number = new BigInteger(cal.currentOperation + ((JButton)e.getSource()).getText());// Problem!!!!! always go out of range//SOLVED
+				
+				//Input test
+				if(number.compareTo(new BigInteger(max +"")) > 0 || number.compareTo(new BigInteger(min + "")) < 0) {
+					
+				}else {
+					if(cal.currentOperation == "0" || Long.parseLong(cal.currentOperation) == 0 || operator == true || evalDone == true) {
+						cal.currentOperation = "";
+						operator = false;
+						evalDone = false;
+					}
+					cal.currentOperation += ((JButton)e.getSource()).getText();
+				}
+			}else if(cal.top.InputScale.getText().contains("HEX")) {
+				number =  new BigInteger(cal.currentOperation + ((JButton)e.getSource()).getText(), 16);
+				//System.out.println(number);
+				
+				//Input test
+				if(number.compareTo(new BigInteger(max +"")) > 0 || number.compareTo(new BigInteger(min + "")) < 0) {
+					
+				}else {
+					if(cal.currentOperation == "0" || Long.parseLong(cal.top.hex2Dec(cal.currentOperation)+"") == 0 || operator == true || evalDone == true) {
+						cal.currentOperation = "";
+						operator = false;
+						evalDone = false;
+					}
+					cal.currentOperation += ((JButton)e.getSource()).getText();
+				}
+			}else if(cal.top.InputScale.getText().contains("BIN")) {
+				number =  new BigInteger(cal.currentOperation + ((JButton)e.getSource()).getText(), 2);
+				
+				//Input test
+				if(number.compareTo(new BigInteger(max +"")) > 0 || number.compareTo(new BigInteger(min + "")) < 0) {
+					
+				}else {
+					if(cal.currentOperation == "0" || Long.parseLong(cal.top.bin2Dec(cal.currentOperation)+"") == 0 || operator == true || evalDone == true) {
+						cal.currentOperation = "";
+						operator = false;
+						evalDone = false;
+					}
+					cal.currentOperation += ((JButton)e.getSource()).getText();
+				}
+			}else if(cal.top.InputScale.getText().contains("OCT")){
+				number =  new BigInteger(cal.currentOperation + ((JButton)e.getSource()).getText(), 8);
+				
+				//Input test
+				if(number.compareTo(new BigInteger(max +"")) > 0 || number.compareTo(new BigInteger(min + "")) < 0) {
+					
+				}else {
+					if(cal.currentOperation == "0" || Long.parseLong(cal.top.oct2Dec(cal.currentOperation)+"") == 0 || operator == true || evalDone == true) {
+						cal.currentOperation = "";
+						operator = false;
+						evalDone = false;
+					}
+					cal.currentOperation += ((JButton)e.getSource()).getText();
+				}
+			}
+			
+		}
+		
+		cal.top.displayCurrent();
+		cal.top.displayDone();
+		cal.top.displayScales();
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent e) {
+		// TODO Auto-generated method stub
+		
+	}
+	
+	public void changeScale(String str) {
+		if(str.contains("DEC")) {
+			num1.setEnabled(true);
+			num2.setEnabled(true);
+			num3.setEnabled(true);
+			num4.setEnabled(true);
+			num5.setEnabled(true);
+			num6.setEnabled(true);
+			num7.setEnabled(true);
+			num8.setEnabled(true);
+			num9.setEnabled(true);
+			num0.setEnabled(true);
+			
+			A.setEnabled(false);
+			B.setEnabled(false);
+			C.setEnabled(false);
+			D.setEnabled(false);
+			E.setEnabled(false);
+			F.setEnabled(false);
+		}else if(str.contains("HEX")) {
+			num1.setEnabled(true);
+			num2.setEnabled(true);
+			num3.setEnabled(true);
+			num4.setEnabled(true);
+			num5.setEnabled(true);
+			num6.setEnabled(true);
+			num7.setEnabled(true);
+			num8.setEnabled(true);
+			num9.setEnabled(true);
+			num0.setEnabled(true);
+			
+			A.setEnabled(true);
+			B.setEnabled(true);
+			C.setEnabled(true);
+			D.setEnabled(true);
+			E.setEnabled(true);
+			F.setEnabled(true);
+		}else if(str.contains("OCT")) {
+			num1.setEnabled(true);
+			num2.setEnabled(true);
+			num3.setEnabled(true);
+			num4.setEnabled(true);
+			num5.setEnabled(true);
+			num6.setEnabled(true);
+			num7.setEnabled(true);
+			num8.setEnabled(false);
+			num9.setEnabled(false);
+			num0.setEnabled(true);
+			
+			A.setEnabled(false);
+			B.setEnabled(false);
+			C.setEnabled(false);
+			D.setEnabled(false);
+			E.setEnabled(false);
+			F.setEnabled(false);
+		}else if(str.contains("BIN")){
+			num1.setEnabled(true);
+			num2.setEnabled(false);
+			num3.setEnabled(false);
+			num4.setEnabled(false);
+			num5.setEnabled(false);
+			num6.setEnabled(false);
+			num7.setEnabled(false);
+			num8.setEnabled(false);
+			num9.setEnabled(false);
+			num0.setEnabled(true);
+			
+			A.setEnabled(false);
+			B.setEnabled(false);
+			C.setEnabled(false);
+			D.setEnabled(false);
+			E.setEnabled(false);
+			F.setEnabled(false);
+		}
+	}
+}
